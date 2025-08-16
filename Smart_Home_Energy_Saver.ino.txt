@@ -1,0 +1,47 @@
+#include <LiquidCrystal.h>
+
+// Pins for LCD
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+// Sensor pins
+int currentSensorPin = A0;  // Current sensor analog pin
+int voltageSensorPin = A1;  // Voltage sensor analog pin
+
+// Constants
+float voltageCalibration = 5.0 / 1023.0;
+float currentCalibration = 30.0; // Example calibration for ACS712
+
+void setup() {
+  lcd.begin(16, 2);  // Initialize LCD
+  lcd.print("Energy Monitor");
+  delay(2000);
+}
+
+void loop() {
+  int currentValue = analogRead(currentSensorPin); // Read current
+  int voltageValue = analogRead(voltageSensorPin); // Read voltage
+  
+  float voltage = voltageValue * voltageCalibration * 220; // Convert to real voltage
+  float current = (currentValue * voltageCalibration - 2.5) * currentCalibration; // Convert to real current
+  
+  float power = voltage * current; // Calculate power
+  
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Voltage:");
+  lcd.print(voltage);
+  lcd.print("V");
+  
+  lcd.setCursor(0, 1);
+  lcd.print("Power:");
+  lcd.print(power);
+  lcd.print("W");
+  
+  // Alert if power exceeds 2000W
+  if(power > 2000){
+    lcd.setCursor(0,1);
+    lcd.print("High Power Alert!");
+  }
+  
+  delay(2000);
+}
